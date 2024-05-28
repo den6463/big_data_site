@@ -1,0 +1,224 @@
+/* Основные стили */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1, h2 {
+    color: #0056b3;
+}
+
+/* Стилизация форм и элементов ввода */
+.form-group, .form-check {
+    margin-bottom: 15px;
+}
+
+select, input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+/* Кнопки */
+button {
+    background: linear-gradient(to right, #006bff, #004ccd);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background: linear-gradient(to right, #0056b3, #003e7e);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Новостной контейнер */
+.news-container {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.news-item {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.news-item:last-child {
+    border-bottom: none;
+}
+
+/* Стилизация графика */
+#myChart {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Анализ данных */
+#data-analysis {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+/* Медиа запросы для адаптивности */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1, h2 {
+        font-size: 20px;
+    }
+}
+/* Стилизация блока анализа данных */
+#data-analysis {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    color: #333;
+}
+
+#data-analysis strong {
+    color: #0056b3;
+    font-size: 18px;
+}
+
+#data-analysis p {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+#data-analysis small {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Цветовые акценты для различных статистических данных */
+.stat-highlight {
+    color: #dc3545; /* Красный для важных отклонений */
+}
+
+.stat-normal {
+    color: #28a745; /* Зеленый для стабильных значений */
+}
+
+.stat-info {
+    color: #17a2b8; /* Голубой для информационных значений */
+}
+
+/* Специальные стили для таблиц и списков в разделе анализа данных */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #f8f9fa;
+}
+
+.data-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Пример простых стилей для страницы */
+#map {
+    margin-top: 20px;
+    width: 100%;
+    min-height: 500px;
+    border: 1px solid #ccc;
+}
+.chart-container {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.analysis-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.analysis-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+#genderChartContainer {
+    height: 250px; /* Установите желаемую высоту */
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: auto !important; /* Это позволяет канвасу масштабироваться с сохранением пропорций */
+}
+/* Общие стили для контейнеров графиков */
+.chart-container {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Специфичные стили для каждого графика */
+#genderChartContainer, #ageChartContainer, #countryChartContainer {
+    width: 100%;
+    max-width: 600px; /* Уменьшаем размер графиков */
+    height: 700px; /* Уменьшаем высоту канваса для графиков */
+    margin: auto; /* Центрируем графики */
+}
+
+/* Стилизация заголовков для блоков */
+.chart-title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}

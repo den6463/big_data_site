@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Погода и качество воздуха</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <style>
+            .container { margin-top: 20px; }
+            #weatherResults, #pollutionResults, #forecastChartContainer, #recommendations { margin-top: 20px; }
+        </style>
+    </head>
+<body>
+<div class="container">
+    <h1>Проверка погоды и качества воздуха</h1>
+    <div class="form-group">
+        <label for="city">Выберите город:</label>
+        <select id="city" class="form-control" onchange="updateCoordinates()">
+            <option value="51.169392,71.449074">Астана</option>
+            <option value="55.7558,37.6173">Москва</option>
+            <option value="40.712776,-74.005974">Нью-Йорк</option>
+            <option value="48.8566,2.3522">Париж</option>
+            <option value="35.6895,139.6917">Токио</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="latitude">Широта:</label>
+        <input type="text" id="latitude" class="form-control" placeholder="Введите широту">
+    </div>
+    <div class="form-group">
+        <label for="longitude">Долгота:</label>
+        <input type="text" id="longitude" class="form-control" placeholder="Введите долготу">
+    </div>
+    <button onclick="fetchWeather()" class="btn btn-primary">Получить текущую погоду</button>
+    <button onclick="fetchAirPollution()" class="btn btn-secondary">Проверить загрязнение воздуха</button>
+    <button onclick="fetchForecast()" class="btn btn-info">Получить прогноз на 5 дней</button>
+    <div id="weatherResults" class="mt-4"></div>
+    <div id="pollutionResults" class="mt-4"></div>
+    <div id="recommendations" class="mt-4"></div>
+    <div id="chartContainer" style="height:40vh; width:80vw">
+        <canvas id="weatherChart"></canvas>
+    </div>
+    <div id="forecastChartContainer" style="height:40vh; width:80vw">
+        <canvas id="forecastChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function updateCoordinates() {
+    const coords = document.getElementById('city').value.split(',');
+    document.getElementById('latitude').value = coords[0];
+    document.getElementById('longitude').value = coords[1];
+}
+
+function fetchWeather() {
+    const lat = document.getElementById('latitude').value;
+    const lon = document.getElementById('longitude').value;
+    const url = `/weather/current/${lat}/${lon}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            displayWeatherData(data);
+            generateRecommendations(data);
+        })
+        .catch(error => {
+            console.error('Ошибка при запросе погоды:', error);
+            document.getElementById('weatherResults').innerHTML = '<p>Ошибка при запросе погоды.</p>';
+        });
+}
+
+function fetchAirPollution() {
+    const lat = document.getElementById('latitude').value;
+    const lon = document.getElementById('longitude').value;
+    const url = `/pollution/${lat}/${lon}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            displayPollutionData(data);
+        })
+        .catch(error => {
+            console.error('Ошибка при запросе данных о загрязнении:', error);
+            document.getElementById('pollutionResults').innerHTML = '<p>Ошибка при запросе данных о загрязнении.</p>';
+        });
+}
+
+function fetchForecast() {
+    const lat = document.getElementById('latitude').value;
+    const lon = document.getElementById('longitude').value;
+    const url = `/weather/forecast/${lat}/${lon}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            drawForecastChart(data);
+        })
+        .catch(error => {
+            console.error('Ошибка при запросе прогноза погоды:', error);
+        });
+}
+
+function displayWeatherData(data) {
+    let results = '<p>Ошибка при получении данных о погоде.</p>';
+    if (data.main) {
+        results = `
+            <h3>Погодные условия:</h3>
+            <p>Температура: ${data.main.temp} °C</p>
+            <p>Ощущается как: ${data.main.feels_like} °C</p>
+            <p>Давление: ${data.main.pressure} hPa</p>
+            <p>Влажность: ${data.main.humidity}%</p>
+            <p>Скорость ветра: ${data.wind.speed} м/с</p>
+            <p>Облачность: ${data.clouds.all}%</p>
+            <p>Описание: ${data.weather[0].description}</p>
+        `;
+        document.getElementById('weatherResults').innerHTML = results;
+        generateRecommendations(data, null); // Обновляем рекомендации с данными о погоде
+    } else {
+        document.getElementById('weatherResults').innerHTML = results;
+    }
+}
+
+function displayPollutionData(data) {
+    let results = '<p>Нет данных о загрязнении воздуха.</p>';
+    if (data.list && data.list.length) {
+        const pollution = data.list[0].components;
+        results = `
+            <h3>Загрязнение воздуха:</h3>
+            <p>CO: ${pollution.co} µg/m³</p>
+            <p>NO: ${pollution.no} µg/m³</p>
+            <p>NO2: ${pollution.no2} µg/m³</p>
+            <p>O3: ${pollution.o3} µg/m³</p>
+            <p>SO2: ${pollution.so2} µg/m³</p>
+            <p>PM2.5: ${pollution.pm2_5} µg/m³</p>
+            <p>PM10: ${pollution.pm10} µg/m³</p>
+            <p>NH3: ${pollution.nh3} µg/m³</p>
+        `;
+        document.getElementById('pollutionResults').innerHTML = results;
+        generateRecommendations(null, data); // Обновляем рекомендации с данными о загрязнении
+    } else {
+        document.getElementById('pollutionResults').innerHTML = results;
+    }
+}
+
+function drawWeatherChart(weatherData) {
+    const ctx = document.getElementById('weatherChart').getContext('2d');
+    const labels = weatherData.map(data => new Date().toLocaleTimeString());
+    const tempData = weatherData.map(data => data.main.temp);
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Температура (°C)',
+                data: tempData,
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+}
+function generateRecommendations(weatherData, pollutionData) {
+    let recommendations = '<h4>Рекомендации:</h4>';
+    let allGood = true;  // Флаг, что все параметры в пределах нормы
+
+    if (weatherData && weatherData.main) {
+        if (weatherData.wind.speed > 10) {
+            recommendations += '<p>Сильный ветер может вызвать задержки в доставке. Рассмотрите возможность использования дополнительных мер предосторожности для транспортных средств.</p>';
+            allGood = false;
+        }
+        if (weatherData.main.temp > 30) {
+            recommendations += '<p>Высокие температуры могут влиять на качество продуктов. Используйте изолированные контейнеры для перевозки чувствительных товаров.</p>';
+            allGood = false;
+        }
+        if (weatherData.main.temp < 0) {
+            recommendations += '<p>Низкие температуры могут привести к замерзанию продукции. Убедитесь, что транспортные средства оснащены адекватным отоплением.</p>';
+            allGood = false;
+        }
+        if (weatherData.clouds.all > 80) {
+            recommendations += '<p>Высокая облачность может влиять на видимость. Будьте осторожны при вождении транспортных средств.</p>';
+            allGood = false;
+        }
+
+        // Если все условия в пределах нормы
+        if (allGood) {
+            recommendations += '<p>Все показатели погоды в норме, можно спокойно отправляться в путь.</p>';
+        }
+    }
+
+    if (pollutionData && pollutionData.list && pollutionData.list.length) {
+        const pollution = pollutionData.list[0].components;
+        if (pollution.pm10 > 50 || pollution.pm2_5 > 25) {
+            recommendations += '<p>Высокое загрязнение воздуха частицами может представлять риск для здоровья. Рассмотрите использование масок или других средств защиты для сотрудников на открытом воздухе.</p>';
+            allGood = false;
+        }
+        if (pollution.o3 > 100) {
+            recommendations += '<p>Высокий уровень озона может привести к затруднениям дыхания. Ограничьте активность на открытом воздухе.</p>';
+            allGood = false;
+        }
+    }
+
+    document.getElementById('recommendations').innerHTML = recommendations;
+}
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="static\geo_data.js"></script>
+</body>
+</html>
